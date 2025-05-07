@@ -1,0 +1,9 @@
+const joi = require("joi")
+const signupValidSchema = joi.object({
+    email: Joi.string().email(),
+    gender: Joi.string().min(4),
+    contact: Joi.number().optional(),
+    password: Joi.string(),
+    confirmPassword: Joi.string(),
+})
+module.exports={signupValidSchema}
