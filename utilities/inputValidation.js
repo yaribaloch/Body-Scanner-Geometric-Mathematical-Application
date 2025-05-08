@@ -6,7 +6,11 @@ const signupValidSchema = Joi.object({
     password: Joi.string(),
     confirmPassword: Joi.string(),
 })
+const loginValidSchema = Joi.object({
+    email: Joi.string().email(),
+    password: Joi.string()
+})
 const otpValidSchema = Joi.object({
     otp: Joi.string(),
 })
-module.exports={signupValidSchema, otpValidSchema}
+module.exports={signupValidSchema, otpValidSchema, loginValidSchema}

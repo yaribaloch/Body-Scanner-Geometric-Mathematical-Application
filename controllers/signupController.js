@@ -18,7 +18,7 @@ try{
         const otp = await generateOTP();
         if(!otp) return res.status(500).json({
             status: false,
-            message: "Could not generate. Please try again."
+            message: "Could not generate OTP. Please try again."
         })
 
         const email = sendEmail(data.email, "OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`)
@@ -72,7 +72,7 @@ try{
     })
 
     return res.status(200).json({
-        status: false,
+        status: true,
         message: "Account created. Please check email to verify your account."
     })
 }catch(error){
