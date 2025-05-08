@@ -1,23 +1,25 @@
 const joi = require("joi")
 const {signupValidSchema} = require("../utilities/inputValidation")
-const User = require("../models/userModel")
+const {User} = require("../models/userModel")
 async function handleSignUp(req, res) {
 try{
-    const data = signupValidSchema.validateAsync(req.body)
-    const user = await User.findOne({email: data.email})
+    const data = await signupValidSchema.validateAsync(req.body)    
+    const user = await User.findOne({email: data.email})    
+    console.log(data);
+        
     if(user){
         if(user.verified) return res.status(400).json({
             status: false,
             message: "Account already exists, please login."
         })
 
-        const otp = generateOTP();
+        const otp = 1111//generateOTP();
         if(!otp) return res.status(500).json({
             status: false,
             message: "Could not generate. Please try again."
         })
 
-        const email = sendEmail("OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`, data.email)
+        const email = true//sendEmail("OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`, data.email)
         if(!email) return res.status(500).json({
             status: false,
             message: "Could not send OTP email. Try again later."
@@ -33,26 +35,29 @@ try{
             status: false,
             message: "Passwords mismatched. Please give same password."
         })
-    const otp = generateOTP();
+    const otp = 111 //generateOTP();
     if(!otp) return res.status(500).json({
         status: false,
         message: "Could not generate. Please try again."
     })
 
-    const email = sendEmail("OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`, data.email)
+    const email = true //sendEmail("OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`, data.email)
     if(!email) return res.status(500).json({
         status: false,
         message: "Could not send OTP email. Try again later."
     })
+    console.log(data);
+    
     const newUser = new User({
-        email:data.email,
-        gender:data.gender,
-        password:data.password,
-        confirmPassword:data.confirmPassword,
-        verified:false,
-        otp:otp
+        email: data.email,
+        gender: data.gender,
+        password: data.password,
+        verified: false,
+        otp: otp
     })
+    
     const userSaved = await newUser.save();
+    console.log(userSaved);
 
     if(!userSaved)
     return res.status(500).json({
@@ -69,3 +74,4 @@ try{
     
 }
 }
+module.exports = {handleSignUp}

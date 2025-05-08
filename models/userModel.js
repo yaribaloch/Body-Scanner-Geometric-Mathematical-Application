@@ -2,28 +2,29 @@ const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 const userSchema = new mongoose.Schema({
     email: {
-        typeof: String,
+        type: String,
     },
     gender: {
-        typeof: String,
+        type: String,
     },
     password: {
-        typeof: String,
+        type: String,
     },
     verified: {
-        typeof: Boolean,
+        type: Boolean,
     },
     otp: {
-        typeof: String,
+        type: String,
     }
 })
-userSchema.pre("save", async(next)=>{
+userSchema.pre("save", async function(next) {
+    const user = this
     try{
-        const user = this
-        const saltRound = 10;
-        const hashedPassword = bcrypt.hash(user.password, saltRound)
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(user.password, salt)
         user.password = hashedPassword
+        next()
 }catch(error){next(error)}
 })
 const User = mongoose.model("User", userSchema)
-module.exports = User
+module.exports = {User}

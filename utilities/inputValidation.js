@@ -1,5 +1,5 @@
-const joi = require("joi")
-const signupValidSchema = joi.object({
+const Joi= require("joi")
+const signupValidSchema = Joi.object({
     email: Joi.string().email(),
     gender: Joi.string().min(4),
     contact: Joi.number().optional(),
