@@ -1,5 +1,7 @@
 const joi = require("joi")
 const {signupValidSchema} = require("../utilities/inputValidation")
+const {generateOTP} = require("../utilities/generateOTP")
+const {sendEmail} = require("../utilities/sendMail")
 const {User} = require("../models/userModel")
 async function handleSignUp(req, res) {
 try{
@@ -13,18 +15,20 @@ try{
             message: "Account already exists, please login."
         })
 
-        const otp = 1111//generateOTP();
+        const otp = await generateOTP();
         if(!otp) return res.status(500).json({
             status: false,
             message: "Could not generate. Please try again."
         })
 
-        const email = true//sendEmail("OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`, data.email)
+        const email = sendEmail(data.email, "OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`)
+        console.log(email);
+        
         if(!email) return res.status(500).json({
             status: false,
             message: "Could not send OTP email. Try again later."
         })
-
+        await User.updateOne({email: user.email}, {otp:otp})
         return res.status(200).json({
             status: false,
             message: "Please check email to verify your account."
@@ -35,13 +39,15 @@ try{
             status: false,
             message: "Passwords mismatched. Please give same password."
         })
-    const otp = 111 //generateOTP();
+    const otp = await generateOTP();
     if(!otp) return res.status(500).json({
         status: false,
         message: "Could not generate. Please try again."
     })
 
-    const email = true //sendEmail("OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`, data.email)
+    const email = sendEmail(data.email, "OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`)
+    console.log(email);
+    
     if(!email) return res.status(500).json({
         status: false,
         message: "Could not send OTP email. Try again later."
