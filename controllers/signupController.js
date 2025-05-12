@@ -1,6 +1,8 @@
 const joi = require("joi")
 const {signupValidSchema} = require("../utilities/inputValidation")
 const {generateOTP} = require("../utilities/generateOTP")
+const bcrypt = require("bcrypt")
+
 const {sendEmail} = require("../utilities/sendMail")
 const {User} = require("../models/userModel")
 async function handleSignUp(req, res) {
@@ -53,11 +55,11 @@ try{
         message: "Could not send OTP email. Try again later."
     })
     console.log(data);
-    
+    const hashedPassword = await bcrypt.hash(data.password, 10)
     const newUser = new User({
         email: data.email,
         gender: data.gender,
-        password: data.password,
+        password: hashedPassword,
         verified: false,
         otp: otp
     })

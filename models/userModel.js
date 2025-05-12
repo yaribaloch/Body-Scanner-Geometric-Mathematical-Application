@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-const bcrypt = require("bcrypt")
+const { boolean } = require("joi")
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -15,16 +15,135 @@ const userSchema = new mongoose.Schema({
     },
     otp: {
         type: String,
+    },
+    wardrobe: [{
+        ref: "Product",
+        type: mongoose.Schema.Types.ObjectId,
+    }],
+    cart:{
+        items: [{
+                productID: {
+                ref: "Product",
+                type: mongoose.Schema.Types.ObjectId
+            },
+            quantity: {
+                type: Number,
+                default: 1
+            },
+            calculatedPrice: {
+                type: Number
+            }
+        }],
+        totalAmount: {
+            type: Number,
+        }
+    },
+    bodyMeasurements:{
+        chest: {
+            type: Number,
+        },
+        waist: {
+            type: Number,
+        },
+        hips: {
+            type: Number,
+        },
+        rise: {
+            type: Number,
+        },
+        length: {
+            type: Number,
+        },
+        lenght2: {
+            type: Number,
+        },
+        outSeam: {
+            type: Number,
+        },
+        inSeam: {
+            type: Number,
+        },
+        crotchDepth: {
+            type: Number,
+        },
+    },
+    stylePrefs:{
+        bodyType: {
+            type: String,
+        },
+        torsoRatio: {
+            type: String,
+        },
+        armLength: {
+            type: String,
+        },
+        necklne: {
+            type: String,
+        },
+        hemline: {
+            type: String,
+        },
+        fabric: {
+            type: String,
+        },
+        print: {
+            type: String,
+        },
+
+    },
+    fitPrefs:{
+        clothingSize: {
+            type: String,
+        },
+        bodyShape: {
+            type: String,
+        },
+        fitted: {
+            type: String,
+        }
+    },
+    colorMatching:{
+        skinTone: {
+            type: String,
+        },
+        personalColorPalette: {
+            type: String,
+        },
+        colorPreference: {
+            type: String,
+        }
+    },
+    settings:{
+        personalization: {
+            style: {
+                type: Boolean,
+                default: true
+            },
+            fit: {
+                type: Boolean,
+                default: true
+            },
+            color: {
+                type: Boolean,
+                default: true
+            }
+        },
+        notifications: {
+            personalizedClothingRecomendation: {
+                type: Boolean,
+                default: false
+            },
+            saleNotification: {
+                type: Boolean,
+                default: false
+            },
+            purchaseNotification: {
+                type: Boolean,
+                default: false
+            }
+        },
     }
 })
-userSchema.pre("save", async function(next) {
-    const user = this
-    try{
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(user.password, salt)
-        user.password = hashedPassword
-        next()
-}catch(error){next(error)}
-})
+
 const User = mongoose.model("User", userSchema)
 module.exports = {User}

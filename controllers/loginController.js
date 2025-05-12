@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt")
 async function handleLogin(req, res) {
     const data = await loginValidSchema.validateAsync(req.body)
     const user = await User.findOne({email: data.email})
+    console.log(user);
+    
     if(!user)
         return res.status(400).json({
             status: false,
@@ -31,18 +33,24 @@ async function handleLogin(req, res) {
             message: "Please check email to verify your account."
         })
     }
-    const passwordMatched = bcrypt.compare(user.password, data.password)
-    if(!passwordMatched)
-        return res.status(400).json({
-            status: false,
-            message: "Wrong Password. Please enter password again."
+    bcrypt.compare( data.password, user.password, (error, result)=>{
+        if(error)
+            return res.status(400).json({
+                status: false,
+                error: error
+            })
+        if(!result)
+            return res.status(400).json({
+                status: false,
+                message: "Wrong Password. Please enter password again."
+            })
+        const accessToken = jwt.sign({userID: user._id}, process.env.JWT_KEY)
+        return res.status(200).json({
+            status: true,
+            message: "You are logged in.",
+            token: accessToken
         })
-    
-    const accessToken = jwt.sign({userID: user._id}, process.env.JWT_KEY)
-    return res.status(200).json({
-        status: true,
-        message: "You are logged in.",
-        token: accessToken
+
     })
 }
 

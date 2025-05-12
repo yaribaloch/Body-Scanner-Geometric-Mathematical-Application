@@ -3,28 +3,28 @@ const mongoose = require("mongoose")
 const orderSchema = new mongoose.Schema({
     userID: {
         ref: "User",
-        typeof: mongoose.Schema.types.ObjectId,
+        type: mongoose.Schema.types.ObjectId,
     },
     items: [{
         productID: {
             ref: "Product",
-            typeof: mongoose.Schema.types.ObjectId,},
+            type: mongoose.Schema.types.ObjectId,},
         quantity: {
-        typeof: Number},
+        type: Number},
         price: {
-        typeof: Number}
+        type: Number}
     }],
     orderDate: {
-        typeof: Date,
+        type: Date,
     },
     totalAmount: {
-        typeof: Number,
+        type: Number,
     },
     isDelivered: {
-        typeof: Boolean,
+        type: Boolean,
     },
     deliveredDate: {
-        typeof: Date,
+        type: Date,
     }
 })
 const Order = mongoose.model("Order", orderSchema)
