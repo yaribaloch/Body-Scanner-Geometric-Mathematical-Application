@@ -10,7 +10,9 @@ async function restrictToLoginnedUserOnly(req, res, next) {
         })
 
     const decodedToken = jwt.verify(token.split(" ")[1], process.env.JWT_KEY)
-    req.userID = decodedToken._id;
+    req.userID = decodedToken.userID;
+    console.log(decodedToken);
+    
     next();
 }
 module.exports = {restrictToLoginnedUserOnly}

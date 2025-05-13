@@ -7,8 +7,9 @@ const {sendEmail} = require("../utilities/sendMail")
 const {User} = require("../models/userModel")
 async function handleSignUp(req, res) {
 try{
-    const data = await signupValidSchema.validateAsync(req.body)    
-    const user = await User.findOne({email: data.email})    
+    const data = await signupValidSchema.validateAsync(req.body)
+    const lowerCaseEmail = data.email.toLowerCase()  
+    const user = await User.findOne({email: lowerCaseEmail})    
     console.log(data);
         
     if(user){
@@ -23,14 +24,14 @@ try{
             message: "Could not generate OTP. Please try again."
         })
 
-        const email = sendEmail(data.email, "OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`)
+        const email = sendEmail(lowerCaseEmail, "OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`)
         console.log(email);
         
         if(!email) return res.status(500).json({
             status: false,
             message: "Could not send OTP email. Try again later."
         })
-        await User.updateOne({email: user.email}, {otp:otp})
+        await User.updateOne({email: lowerCaseEmail}, {otp:otp})
         return res.status(200).json({
             status: false,
             message: "Please check email to verify your account."
@@ -47,7 +48,7 @@ try{
         message: "Could not generate. Please try again."
     })
 
-    const email = sendEmail(data.email, "OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`)
+    const email = sendEmail(lowerCaseEmail, "OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`)
     console.log(email);
     
     if(!email) return res.status(500).json({
@@ -57,11 +58,69 @@ try{
     console.log(data);
     const hashedPassword = await bcrypt.hash(data.password, 10)
     const newUser = new User({
-        email: data.email,
+        email: lowerCaseEmail,
         gender: data.gender,
         password: hashedPassword,
         verified: false,
-        otp: otp
+        otp: otp,
+        cart:{
+            items:[
+                // {
+                // productID:0.0,
+                // imageUrl: 0.0,
+                // quantity:0.0,
+                // calculatedPrice:0.0,
+                // subtotal:0.0,
+                // shipping:0.0,
+                // total:0.0,
+                // }
+            ],
+            subtotal:0.00,
+            shipping:0.00,
+            total:0.00,  
+            },
+        bodyMeasurements:{
+            chest:0.0,
+            waist:0.0,
+            hips:0.0,
+            rise:0.0,
+            length:0.0,
+            lenght2:0.0,
+            outSeam:0.0,
+            inSeam:0.0,
+            crotchDepth:0.0,
+        },
+        stylePrefs:{
+            bodyType:0.0,
+            torsoRatio:0.0,
+            armLength:0.0,
+            necklne:0.0,
+            hemline: 0.0,
+            fabric:0.0,
+            print:0.0,
+        },
+        fitPrefs:{
+            clothingSize:0.0,
+            bodyShape:0.0,
+            fitted:0.0
+        },
+        colorMatching:{
+            skinTone:0.0,
+            personalColorPalette:0.0,
+            colorPreference:0.0
+        },
+        settings:{
+            personalization: {
+                style:0,
+                fit:0,
+                color:0,
+            },
+            notifications: {
+                personalizedClothingRecomendation: 0,
+                saleNotification:0,
+                purchaseNotification:0
+            },
+        }
     })
     
     const userSaved = await newUser.save();

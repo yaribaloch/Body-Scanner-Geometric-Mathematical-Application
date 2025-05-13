@@ -21,10 +21,13 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
     }],
     cart:{
-        items: [{
+        items:[{
                 productID: {
                 ref: "Product",
                 type: mongoose.Schema.Types.ObjectId
+            },
+            imageUrl: {
+                type: String,
             },
             quantity: {
                 type: Number,
@@ -32,11 +35,27 @@ const userSchema = new mongoose.Schema({
             },
             calculatedPrice: {
                 type: Number
+            },
+            subtotal:{
+                type: Number
+            },
+            shipping:{
+                type: Number
+            },
+            total:{
+                type: Number
             }
-        }],
-        totalAmount: {
+            }],
+        subtotal: {
             type: Number,
-        }
+        },
+        shipping: {
+            type: Number,
+        },
+        total: {
+            type: Number,
+        },
+        
     },
     bodyMeasurements:{
         chest: {

@@ -1,9 +1,12 @@
 const mongoose = require("mongoose")
 
 const productSchema = new mongoose.Schema({
+    name: {
+        type: String,
+    },
     size: [{
         measure: {
-        type: Number
+        type: String
         },
         quantity:{
         type: Number
@@ -12,9 +15,12 @@ const productSchema = new mongoose.Schema({
     brand: {
         type: String,
     },
-    type: {
+    imageUrl: {
         type: String,
     },
+    colors: [{
+        type: String,
+    }],
     price: {
         type: Number,
     },
@@ -26,6 +32,10 @@ const productSchema = new mongoose.Schema({
     },
     description: {
         type: String,
+    },
+    createdBy:{
+        ref: "User",
+        type: mongoose.Schema.Types.ObjectId
     }
 })
 const Product = mongoose.model("Product", productSchema)

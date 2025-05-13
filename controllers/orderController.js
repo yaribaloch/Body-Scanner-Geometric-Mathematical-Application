@@ -5,7 +5,8 @@ const {signupValidSchema} = require("../utilities/inputValidation")
 // const {User} = require("../models/userModel")
 async function handlePlaceOrder(req, res) {
 try{
-    const data = await signupValidSchema.validateAsync(req.body)    
+    const data = await orderValidSchema.validateAsync(req.body)
+    // Stripe payment module
     return res.status(200).json({
         status: true,
         message: "Order placed."
