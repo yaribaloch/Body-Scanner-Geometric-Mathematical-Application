@@ -3,8 +3,8 @@ const {otpValidSchema} = require("../utilities/inputValidation")
 async function handleOTPVerification(req, res) {
     const data = await otpValidSchema.validateAsync(req.body)
     console.log(data.otp);
-    
-    const user = await User.findOne({otp: data.otp, email:data.email})
+    const email = data.email.toLowerCase()
+    const user = await User.findOne({otp: data.otp, email:email})
     if(!user)
         return res.status(400).json({
             status: false,

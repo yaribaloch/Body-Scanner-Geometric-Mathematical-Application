@@ -18,26 +18,28 @@ async function handleShop(req, res) {
 async function handleAddToCart(req, res) {
     const userID = req.userID
     const user =await User.findOne({_id: userID})
-    const item = req.body
+    const data = req.body
+    //check if product actually exists
+    const product = await Product.findById({_id: data.productID})
+    
+    if(!product)
+        return res
+        .status(500)
+        .json({
+            status:false,
+            message:"Opps, ivalid product ID."
+        })    
     //check if userID, user or item missing
-    if(!userID || !user || !item)
+    if(!userID || !user || !product)
         return res
         .status(500)
         .json({
             status:false,
             message: user? "Looks like you are logged out.": "Please select an item to put in cart."
         })
-    //check if product actually exists
-    const checkProduct = await Product.exists({_id: item.productID})
-    if(!checkProduct)
-        return res
-        .status(500)
-        .json({
-            status:false,
-            message:"Opps, ivalid product ID."
-        })
-    //check if item is already in cart
-    if(user.cart.items.some(itm=> itm.productID.equals(item.productID)))
+
+    //check if item is already in cart    
+    if(user.cart.items.some(itm=> itm.productID.equals(product._id)))
         return res
         .status(500)
         .json({
@@ -46,15 +48,19 @@ async function handleAddToCart(req, res) {
         })
         //push new product into cart items
         user.cart.items.push({
-            productID: item.productID,
-            imageUrl:item.imageUrl,
-            quantity:item.quantity,
-            calculatedPrice: item.price
+            productID: product._id,
+            imageUrl:product.imageUrl,
+            quantity:data.quantity,
+            calculatedPrice: product.price
         })
         //adding price of the new item to the subtotal of cart
-        user.cart.subtotal += item.price
+        user.cart.subtotal += product.price
         user.cart.shipping = process.env.SHIPPING_PRICE
-        user.cart.total += item.price+ parseFloat(process.env.SHIPPING_PRICE)
+        if(user.cart.items.length==1){
+            user.cart.total += (product.price+ parseFloat(process.env.SHIPPING_PRICE))
+        }else{
+            user.cart.total += product.price
+        }
     const savedUser = await user.save()
     return res
         .status(300)
@@ -64,13 +70,20 @@ async function handleAddToCart(req, res) {
             savedUser: savedUser
         })
 }
-async function handleRemoveCart(req, res) {
+async function handleRemoveFromCart(req, res) {
     const userID = req.userID
     const user =await User.findOne({_id: userID})
-    const item = req.body
-    const product = await Product.findOne({_id: item.productID})
+    const data = req.body
+    const product = await Product.findById({_id: data.productID})
+    if(!product)
+        return res
+        .status(500)
+        .json({
+            status:false,
+            message:"Opps, ivalid product ID."
+        })    
     //check if userID, user or item missing
-    if(!userID || !user || !item)
+    if(!userID || !user || !data)
         return res
         .status(500)
         .json({
@@ -78,7 +91,7 @@ async function handleRemoveCart(req, res) {
             message: userID? "Looks like you are logged out.": "Please select an item to remove from cart."
         })
     //check if product actually exists in cart
-    if(!user.cart.items.some(itm=> itm.productID.equals(item.productID)))
+    if(!user.cart.items.some(itm=> itm.productID.equals(data.productID)))
         return res
         .status(500)
         .json({
@@ -86,11 +99,15 @@ async function handleRemoveCart(req, res) {
             message:"Item not in the cart."
         })
     //pull the product from cart items
-    user.cart.items= user.cart.items.filter(item=>{item.productID.equals(product.productID)})
+    user.cart.items= user.cart.items.filter(item=>{return !item.productID.equals(product.productID)})
     //adding price of the new item to the subtotal of cart
     user.cart.subtotal -= product.price
     user.cart.shipping = process.env.SHIPPING_PRICE
-    user.cart.total -= (item.price+ parseFloat(process.env.SHIPPING_PRICE))
+    if(user.cart.items.length==0){    
+        user.cart.total -= (product.price+ parseFloat(process.env.SHIPPING_PRICE))
+    }else{
+        user.cart.total -= (product.price)
+    }
     const savedUser = await user.save()
     return res
         .status(300)
@@ -168,4 +185,4 @@ async function handleAddProduct(req, res) {
     //     newProduct: savedProduct
     // })
 }
-module.exports = {handleShop, handleAddToCart, handleAddProduct}
+module.exports = {handleShop, handleAddToCart, handleAddProduct, handleRemoveFromCart}
