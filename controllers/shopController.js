@@ -55,13 +55,8 @@ async function handleAddToCart(req, res) {
             quantity:1,
             calculatedPrice: product.price
         })
-        //recalculate prices
-        user.cart.subtotal =0.00
-        user.cart.items.forEach(item => {
-            user.cart.subtotal += item.calculatedPrice
-        });
-        user.cart.shipping =  process.env.SHIPPING_PRICE
-        user.cart.total =  parseFloat(process.env.SHIPPING_PRICE) + user.cart.subtotal
+    //calculate and set cart price
+    calculateCartPrice(user)
     const savedUser = await user.save()
     return res
         .status(300)
@@ -102,16 +97,8 @@ async function handleRemoveFromCart(req, res) {
     //pull the product from cart items
     const item = user.cart.items.find(itm=>itm.productID==data.productID)    
     user.cart.items.pull(item)
-    //zero shipping when no item in cart
-    const shipping = user.cart.items.length>0? parseFloat(process.env.SHIPPING_PRICE) : 0.00
-    //reset subtotal
-    user.cart.subtotal =0.00
-    //recalculate prices
-    user.cart.items.forEach(item => {
-        user.cart.subtotal += item.calculatedPrice
-    });
-    user.cart.shipping =  shipping
-    user.cart.total =  shipping + user.cart.subtotal
+    //calculate and set cart price
+    calculateCartPrice(user)
 
     const savedUser = await user.save()
     return res
@@ -191,14 +178,8 @@ async function handleSetItemQuantity(req, res) {
     user.cart.items=newItems
     console.log("new items: ", newItems);
     
-    //conditional shipping
-    const shipping = parseFloat(process.env.SHIPPING_PRICE)
-    //recalculate prices
-    user.cart.subtotal =0.00
-    user.cart.items.forEach(itm => {
-        user.cart.subtotal += itm.calculatedPrice
-    });
-    user.cart.total = shipping + user.cart.subtotal
+    //calculate and set cart price
+    calculateCartPrice(user)
     const updatedUser = await user.save()
     return res
         .status(300)
@@ -292,35 +273,18 @@ async function handlePlaceOrder(req, res) {
             status:false,
             message: "Array of products expected."
         })
-    // const { size,brand,type, colors,price,rating,category,description} = req.body
-
-    // const newProduct = new Product({
-        
-    // size: size,
-    // brand: brand,
-    // type: type,
-    // colors: colors,
-    // price: price,
-    // rating: rating,
-    // category: category,
-    // description: description,
-    // createdBy: userID})
-    // const savedProduct = await newProduct.save()
-    // if(!savedProduct)
-    //     return res
-    //     .staus(400)
-    //     .json({
-    //         status:false,
-    //         message: "Couldn't save the Product."
-    //     })
-
-    // return res
-    // .status(300)
-    // .json({
-    //     status:true,
-    //     message: "Product saved successfuly.",
-    //     newProduct: savedProduct
-    // })
+}
+async function calculateCartPrice(user) {
+        //reset shipping when no item in cart
+        const shipping = user.cart.items.length>0? parseFloat(process.env.SHIPPING_PRICE) : 0.00
+        //reset subtotal
+        user.cart.subtotal =0.00
+        //recalculate prices
+        user.cart.items.forEach(item => {
+            user.cart.subtotal += item.calculatedPrice
+        });
+        user.cart.shipping =  shipping
+        user.cart.total =  shipping + user.cart.subtotal
 }
 module.exports = {handleShop, 
     handleAddToCart, 
