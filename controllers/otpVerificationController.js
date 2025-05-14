@@ -10,7 +10,14 @@ async function handleOTPVerification(req, res) {
             status: false,
             message: "Invalid OTP."
         })
-
+    //user already verified means request is from Password Reset
+    //as verified user can't generate OTP from signup/login
+    if(user.verified)
+        return res.status(200).json({
+        status: true,
+        message: "OTP verified."
+        })
+    //user not verified means request is from signup/login
     await User.updateOne({email:user.email}, {verified:true})
     return res.status(200).json({
         status: true,

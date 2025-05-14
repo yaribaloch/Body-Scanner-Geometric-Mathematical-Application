@@ -5,6 +5,7 @@ const signupRouter = require("./routes/signupRoute")
 const otpRoute = require("./routes/otpRoute")
 const loginRoute = require("./routes/loginRoute")
 const shopRoute = require("./routes/shopRoute")
+const userRoute = require("./routes/userRoute")
 const orderRoute = require("./routes/orderRoute")
 const app = express()
 
@@ -16,6 +17,7 @@ connectMongoDB();
 app.use("/signup", signupRouter)
 app.use("/otpverification", otpRoute)
 app.use("/login", loginRoute)
+app.use("/user", userRoute)
 app.use("/shop", shopRoute)
 app.use("/placeorder", orderRoute)
 

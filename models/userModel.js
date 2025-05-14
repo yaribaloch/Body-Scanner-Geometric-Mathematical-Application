@@ -122,15 +122,15 @@ const userSchema = new mongoose.Schema({
         }
     },
     colorMatching:{
-        skinTone: {
+        skinTone: [{
             type: String,
-        },
-        personalColorPalette: {
+        }],
+        personalColorPalette: [{
             type: String,
-        },
-        colorPreference: {
+        }],
+        colorPreference: [{
             type: String,
-        }
+        }]
     },
     settings:{
         personalization: {

@@ -3,6 +3,8 @@ const {User} = require("../models/userModel")
 const {Product} = require("../models/productModel")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
+const {generateOTP} = require("../utilities/generateOTP")
+const {sendEmail} = require("../utilities/sendMail")
 const { default: mongoose } = require("mongoose")
 async function handleShop(req, res) {
     const filter = req.query
@@ -117,6 +119,35 @@ async function handleRemoveFromCart(req, res) {
             savedUser: savedUser
         })
 }
+async function handleCart(req, res) {
+    const userID = req.userID
+    const user =await User.findOne({_id: userID})   
+    //check if userID, user or item missing
+    if(!userID || !user)
+        return res
+        .status(500)
+        .json({
+            status:false,
+            message: userID? "Looks like you are logged out.": "Could not access user."
+        })
+        
+    const cart = user.cart
+    //check if cart is empty
+    if(cart.items.length==0)
+    return res
+        .status(500)
+        .json({
+            status:false,
+            message: "Cart is empty."
+        })
+    return res
+        .status(300)
+        .json({
+            status:true,
+            message: "Cart.",
+            cart: cart
+        })
+}
 async function handleAddProduct(req, res) {
     const userID = req.userID
     const products = req.body
@@ -185,4 +216,9 @@ async function handleAddProduct(req, res) {
     //     newProduct: savedProduct
     // })
 }
-module.exports = {handleShop, handleAddToCart, handleAddProduct, handleRemoveFromCart}
+module.exports = {handleShop, 
+    handleAddToCart, 
+    handleAddProduct, 
+    handleRemoveFromCart, 
+    handleCart
+}
