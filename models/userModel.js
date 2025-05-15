@@ -22,9 +22,15 @@ const userSchema = new mongoose.Schema({
     }],
     cart:{
         items:[{
-                productID: {
+            productID: {
                 ref: "Product",
                 type: mongoose.Schema.Types.ObjectId
+            },
+            name: {
+                type: String
+            },
+            description: {
+                type: String
             },
             imageUrl: {
                 type: String,

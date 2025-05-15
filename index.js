@@ -6,7 +6,7 @@ const otpRoute = require("./routes/otpRoute")
 const loginRoute = require("./routes/loginRoute")
 const shopRoute = require("./routes/shopRoute")
 const userRoute = require("./routes/userRoute")
-const orderRoute = require("./routes/orderRoute")
+//const orderRoute = require("./routes/orderRoute")
 const app = express()
 
 app.use(express.urlencoded({extended:true}))
@@ -19,7 +19,7 @@ app.use("/otpverification", otpRoute)
 app.use("/login", loginRoute)
 app.use("/user", userRoute)
 app.use("/shop", shopRoute)
-app.use("/placeorder", orderRoute)
+//app.use("/placeorder", orderRoute)
 
 app.listen(3000, ()=>{console.log("App is live at port 3000.");
 })

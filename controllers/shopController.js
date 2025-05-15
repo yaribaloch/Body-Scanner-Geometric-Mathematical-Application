@@ -1,11 +1,15 @@
 const {loginValidSchema} = require("../utilities/inputValidation")
 const {User} = require("../models/userModel")
 const {Product} = require("../models/productModel")
+const {Order} = require("../models/orderModel")
+const {makeStripePayment} = require("../utilities/stripePayment")
+const stripe = require("stripe")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const {generateOTP} = require("../utilities/generateOTP")
 const {sendEmail} = require("../utilities/sendMail")
 const { default: mongoose } = require("mongoose")
+const { default: Stripe } = require("stripe")
 async function handleShop(req, res) {
     const filter = req.query
     const products = await Product.find(filter, {_id:1, type: 1, price:1, rating:1})
@@ -51,6 +55,8 @@ async function handleAddToCart(req, res) {
         //push new product into cart items
         user.cart.items.push({
             productID: product._id,
+            name: product.name,
+            description: product.description,
             imageUrl:product.imageUrl,
             quantity:1,
             calculatedPrice: product.price
@@ -169,6 +175,8 @@ async function handleSetItemQuantity(req, res) {
     const item = {
         productID: productID,
         imageUrl: product.imageUrl,
+        name: product.name,
+        description: product.description,
         quantity: quantity,
         calculatedPrice: product.price * quantity
     }
@@ -259,20 +267,16 @@ async function handleAddProduct(req, res) {
 }
 async function handlePlaceOrder(req, res) {
     const userID = req.userID
-    const cart = req.body.cart
+    const user = await User.findById({_id: userID})
+    const cart = user.cart
    if(!cart)
         return res
         .status(400)
         .json({
             status:false,
-            message: "Cann't place order over empty cart."
-        })    
-    return res
-        .status(500)
-        .json({
-            status:false,
-            message: "Array of products expected."
+            message: "Cann't place order for an empty cart."
         })
+    makeStripePayment(res, cart);
 }
 async function calculateCartPrice(user) {
         //reset shipping when no item in cart
@@ -286,10 +290,46 @@ async function calculateCartPrice(user) {
         user.cart.shipping =  shipping
         user.cart.total =  shipping + user.cart.subtotal
 }
+async function handlePaymentSuccess(req, res) {
+    const userID = req.userID
+    const sessionID = req.query.session_id
+    const retrievedSession = await stripe.checkout.sessions.retrieve(sessionID);
+    const cart = JSON.parse(retrievedSession.metadata.cart)
+    console.log("cart: ", cart);
+    
+    const order = new Order({
+        userID: userID,
+        items: cart.items.map(itm=>itm),
+        orderDate: Date.now(),
+        totalAmount: cart.total,
+        isDelivered:false,
+        deliveredDate: "../../...."
+    })
+
+    return res
+        .status(300)
+        .json({
+            status:true,
+            message: "!WOAOW.. Payment done, order placed.",
+            order: order
+        })
+}
+async function handlePaymentCancel(req, res) {
+    return res
+        .status(500)
+        .json({
+            status:false,
+            message: ".OOPS!! Payment canceled, order also."
+        })
+}
+
 module.exports = {handleShop, 
     handleAddToCart, 
     handleAddProduct, 
     handleRemoveFromCart, 
     handleCart,
-    handleSetItemQuantity
+    handlePlaceOrder,
+    handleSetItemQuantity,
+    handlePaymentSuccess,
+    handlePaymentCancel
 }
