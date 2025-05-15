@@ -5,7 +5,7 @@ async function restrictToLoginnedUserOnly(req, res, next) {
 
     if(!token)
         return res.status(400).json({
-            status: true,
+            status: false,
             message: "Please login."
         })
 

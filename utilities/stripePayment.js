@@ -1,7 +1,14 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET)
 const axios = require("axios")
 
-async function makeStripePayment(res, cart) {
+async function makeStripePayment(req, res, cart) {
+  //data to be stored in order
+    const order ={
+        items: cart.items.map(itm=>itm),
+        userID: req.userID,
+        totalAmount: cart.total,
+        isDelivered:false,
+    }
     const lineItems = cart.items.map(item=>{
         return {
             price_data: {
@@ -15,14 +22,13 @@ async function makeStripePayment(res, cart) {
             quantity: item.quantity
         }
     })
-    console.log("line items: ", lineItems);
     
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: 'payment',
       line_items: lineItems,
-      metadata: {cart: JSON.stringify(cart)},
-      success_url: "http://localhost:3000/shop/payment_successful",
+      metadata: {cart: JSON.stringify(order)},
+      success_url: "http://localhost:3000/shop/payment_successful?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: "http://localhost:3000/shop/payment_cancel",
       shipping_options:[{
         shipping_rate: process.env.STRIPE_SHIPPING_KEY

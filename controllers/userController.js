@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt")
 const {generateOTP} = require("../utilities/generateOTP")
 const {sendEmail} = require("../utilities/sendMail")
 const { default: mongoose } = require("mongoose")
+const { Order } = require("../models/orderModel")
 
 async function handleReqResetPassword(req, res) {
     const userEmail = req.body.email.toLowerCase()   
@@ -120,6 +121,31 @@ async function handleSetSetting(req, res) {
         status:true,
         message: "Your preferences added.",
         user: updatedUser
+    })
+
+}
+async function handleOrderHistory(req, res) {
+    const userID = req.userID
+    const user  =await User.findById({_id:userID})
+    let orders = []
+    for(const orderId in user.orders){
+        const order  =await Order.findById({_id:orderId})
+        orders.push(order)
+    }
+    if(!orders)
+    return res
+    .status(500)
+    .json({
+        status:false,
+        message: ".Naana!! Empty order history.",
+    })
+
+    return res
+    .status(300)
+    .json({
+        status:true,
+        message: "!Woof.. Found good order history..",
+        orders: orders
     })
 
 }

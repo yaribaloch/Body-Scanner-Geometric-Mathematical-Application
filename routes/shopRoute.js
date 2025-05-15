@@ -11,6 +11,8 @@ const {handleShop,
     handlePaymentSuccess
 } = require("../controllers/shopController")
 const {restrictToLoginnedUserOnly} = require("../middlewares/auth")
+router.get("/payment_successful", handlePaymentSuccess)
+router.get("/payment_cancel", handlePaymentCancel)
 router.use(restrictToLoginnedUserOnly)
 router.post("/products", handleShop)
 router.post("/add_to_cart", handleAddToCart)
@@ -19,7 +21,5 @@ router.get("/cart", handleCart)
 router.post("/set_item_quantity", handleSetItemQuantity)
 router.post("/add_product", handleAddProduct)
 router.get("/place_order", handlePlaceOrder)
-router.get("/payment_successful", handlePaymentSuccess)
-router.get("/payment_cancel", handlePaymentCancel)
 
 module.exports = router

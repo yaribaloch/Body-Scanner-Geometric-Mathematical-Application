@@ -3,7 +3,7 @@ const {User} = require("../models/userModel")
 const {Product} = require("../models/productModel")
 const {Order} = require("../models/orderModel")
 const {makeStripePayment} = require("../utilities/stripePayment")
-const stripe = require("stripe")
+const stripe = require("stripe")(process.env.STRIPE_SECRET)
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const {generateOTP} = require("../utilities/generateOTP")
@@ -291,27 +291,20 @@ async function calculateCartPrice(user) {
         user.cart.total =  shipping + user.cart.subtotal
 }
 async function handlePaymentSuccess(req, res) {
-    const userID = req.userID
     const sessionID = req.query.session_id
     const retrievedSession = await stripe.checkout.sessions.retrieve(sessionID);
-    const cart = JSON.parse(retrievedSession.metadata.cart)
-    console.log("cart: ", cart);
-    
-    const order = new Order({
-        userID: userID,
-        items: cart.items.map(itm=>itm),
-        orderDate: Date.now(),
-        totalAmount: cart.total,
-        isDelivered:false,
-        deliveredDate: "../../...."
-    })
+    const orderData = JSON.parse(retrievedSession.metadata.order)
+    const user = await User.findById({_id: orderData.userID})
 
+    const order = new Order(orderData)
+    const newOrder = await order.save();
+    user.orders.push(newOrder._id)
     return res
         .status(300)
         .json({
             status:true,
             message: "!WOAOW.. Payment done, order placed.",
-            order: order
+            order: newOrder
         })
 }
 async function handlePaymentCancel(req, res) {

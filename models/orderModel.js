@@ -1,10 +1,6 @@
 const mongoose = require("mongoose")
 
 const orderSchema = new mongoose.Schema({
-    userID: {
-        ref: "User",
-        type: mongoose.Schema.Types.ObjectId,
-    },
     items: [{
         productID: {
             ref: "Product",
@@ -16,6 +12,7 @@ const orderSchema = new mongoose.Schema({
     }],
     orderDate: {
         type: Date,
+        default:Date.now
     },
     totalAmount: {
         type: Number,
@@ -28,4 +25,4 @@ const orderSchema = new mongoose.Schema({
     }
 })
 const Order = mongoose.model("Order", orderSchema)
-module.exports=Order
+module.exports={Order}
