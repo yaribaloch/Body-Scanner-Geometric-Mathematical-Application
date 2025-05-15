@@ -126,12 +126,8 @@ async function handleSetSetting(req, res) {
 }
 async function handleOrderHistory(req, res) {
     const userID = req.userID
-    const user  =await User.findById({_id:userID})
-    let orders = []
-    for(const orderId in user.orders){
-        const order  =await Order.findById({_id:orderId})
-        orders.push(order)
-    }
+    const user  =await User.findById(userID).populate("orders");
+    const orders = user.orders
     if(!orders)
     return res
     .status(500)
@@ -154,5 +150,6 @@ module.exports = {
     handleReqResetPassword,
     handleResetPassword,
     handleSetPreferences,
-    handleSetSetting
+    handleSetSetting,
+    handleOrderHistory
 }

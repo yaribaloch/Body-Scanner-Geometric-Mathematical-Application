@@ -4,7 +4,8 @@ const {
     handleReqResetPassword,
     handleResetPassword,
     handleSetPreferences,
-    handleSetSetting
+    handleSetSetting,
+    handleOrderHistory
 } = require("../controllers/userController")
 const {restrictToLoginnedUserOnly} = require("../middlewares/auth")
 router.post("/forget_password", handleReqResetPassword)
@@ -16,6 +17,7 @@ router.post("/set_fit_preferences", handleSetPreferences)
 router.post("/set_color_matching", handleSetPreferences)
 router.post("/set_settings_pers", handleSetSetting)
 router.post("/set_settings_notif", handleSetSetting)
+router.get("/order_history", handleOrderHistory)
 
 
 module.exports = router

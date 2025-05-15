@@ -27,7 +27,7 @@ async function makeStripePayment(req, res, cart) {
       payment_method_types: ["card"],
       mode: 'payment',
       line_items: lineItems,
-      metadata: {cart: JSON.stringify(order)},
+      metadata: {order: JSON.stringify(order)},
       success_url: "http://localhost:3000/shop/payment_successful?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: "http://localhost:3000/shop/payment_cancel",
       shipping_options:[{

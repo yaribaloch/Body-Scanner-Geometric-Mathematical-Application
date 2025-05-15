@@ -276,7 +276,7 @@ async function handlePlaceOrder(req, res) {
             status:false,
             message: "Cann't place order for an empty cart."
         })
-    makeStripePayment(res, cart);
+    makeStripePayment(req, res, cart);
 }
 async function calculateCartPrice(user) {
         //reset shipping when no item in cart
@@ -299,6 +299,15 @@ async function handlePaymentSuccess(req, res) {
     const order = new Order(orderData)
     const newOrder = await order.save();
     user.orders.push(newOrder._id)
+    const savedUser =await user.save()
+    if(!savedUser || !newOrder)
+    return res
+        .status(400)
+        .json({
+            status:false,
+            message: "!Ufff.. Order could not be saved.",
+            order: newOrder
+        })
     return res
         .status(300)
         .json({
