@@ -4,6 +4,15 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
     },
+    name: {
+        type: String,
+    },
+    facebookId: {
+        type: String,
+    },
+    googleId: {
+        type: String,
+    },
     gender: {
         type: String,
     },
