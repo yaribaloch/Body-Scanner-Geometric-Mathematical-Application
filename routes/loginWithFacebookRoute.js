@@ -2,26 +2,25 @@ const express = require("express")
 const passport = require("passport")
 const JWT = require("jsonwebtoken")
 const {User} = require("../models/userModel")
-const googleStrategy = require("passport-google-oauth20").Strategy
-const router = express.Router();
+const FacebookStrategy = require("passport-facebook").Strategy;const router = express.Router();
 // router.use(session({
 //     secret: process.env.JWT_KEY, // Using your existing JWT key for session
 //     resave: false,
 //     saveUninitialized: false,
 //     cookie: { secure: process.env.NODE_ENV === 'production' } // Secure in production
 //   }));
-passport.use(new googleStrategy({
-    clientID: process.env.G_CLIENT_ID ,
-    clientSecret: process.env.G_CLIENT_SECRET,
-    callbackURL: process.env.G_LOGIN_CALLBACK_URL
+passport.use(new FacebookStrategy({
+    clientID: process.env.FB_CLIENT_ID ,
+    clientSecret: process.env.FB_CLIENT_SECRET,
+    callbackURL: process.env.FB_LOGIN_CALLBACK_URL
 }, async function(accessToken, refreshToken, profile, cb){
-    const googleId=profile.id
-    const user = await User.findOne({googleId})
+    const facebookId=profile.id
+    const user = await User.findOne({facebookId})
     if(!user){
         console.log("User not found.");
         
         const newUser = new User({
-            googleId:googleId,
+            facebookId:facebookId,
             name: profile.displayName, 
             email: profile.emails[0]?.value, 
             verified: true,
@@ -42,16 +41,16 @@ passport.use(new googleStrategy({
 //     res.redirect('http://localhost:3000/shop/products')
 // })
 router.get("/", (req, res)=>{
-    res.send('<a href="/login_with_google/auth/google">Login With Google</a>')
+    res.send('<a href="/login_with_facebook/auth/facebook">Login With Facebook</a>')
 })
-router.get('/auth/google', passport.authenticate('google', {scope:["profile", "email"]}))
-router.get('/auth/google/callback', passport.authenticate('google', {session:false,failureRedirect:'/login_with_google/auth/google/error'}), function(req, res){
-    const accessToken = JWT.sign({userID: req.user? req.user._id:req.newUser._id}, process.env.JWT_KEY)    
+router.get('/auth/facebook', passport.authenticate('facebook', {scope:["public_profile"]}))
+router.get('/auth/facebook/callback', passport.authenticate('facebook', {session:false,failureRedirect:'/login_with_facebook/auth/facebook/error'}), function(req, res){
+    const accessToken = JWT.sign({userID:req.user._id}, process.env.JWT_KEY)    
     console.log
     ("ID: ",req.user._id)
-    res.status(300).json({
+    res.status(200).json({
     status: true,
-    message: "User authenticated via Google.",
+    message: "User authenticated via Facebook.",
     token: accessToken
     })
 })
