@@ -14,7 +14,7 @@ async function handleShop(req, res) {
     const filter = req.query
     const products = await Product.find(filter, {_id:1, type: 1, price:1, rating:1})
     return res
-    .staus(300)
+    .status(300)
     .json({
         status:true,
         pruducs: products
