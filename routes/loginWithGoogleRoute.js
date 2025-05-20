@@ -4,12 +4,7 @@ const JWT = require("jsonwebtoken")
 const {User} = require("../models/userModel")
 const googleStrategy = require("passport-google-oauth20").Strategy
 const router = express.Router();
-// router.use(session({
-//     secret: process.env.JWT_KEY, // Using your existing JWT key for session
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: { secure: process.env.NODE_ENV === 'production' } // Secure in production
-//   }));
+
 passport.use(new googleStrategy({
     clientID: process.env.G_CLIENT_ID ,
     clientSecret: process.env.G_CLIENT_SECRET,
@@ -37,10 +32,6 @@ passport.use(new googleStrategy({
 }
 ))
 
-// router.get("/", passport.authenticate('facebook', {scope: ['email']}))
-// router.get('/callback', passport.authenticate('facebook', {failureRedirect:'auth/facebook/error'}), function(res,req){
-//     res.redirect('http://localhost:3000/shop/products')
-// })
 router.get("/", (req, res)=>{
     res.send('<a href="/login_with_google/auth/google">Login With Google</a>')
 })

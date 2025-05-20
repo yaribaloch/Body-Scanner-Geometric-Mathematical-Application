@@ -3,12 +3,6 @@ const passport = require("passport")
 const JWT = require("jsonwebtoken")
 const {User} = require("../models/userModel")
 const FacebookStrategy = require("passport-facebook").Strategy;const router = express.Router();
-// router.use(session({
-//     secret: process.env.JWT_KEY, // Using your existing JWT key for session
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: { secure: process.env.NODE_ENV === 'production' } // Secure in production
-//   }));
 passport.use(new FacebookStrategy({
     clientID: process.env.FB_CLIENT_ID ,
     clientSecret: process.env.FB_CLIENT_SECRET,
@@ -36,10 +30,6 @@ passport.use(new FacebookStrategy({
 }
 ))
 
-// router.get("/", passport.authenticate('facebook', {scope: ['email']}))
-// router.get('/callback', passport.authenticate('facebook', {failureRedirect:'auth/facebook/error'}), function(res,req){
-//     res.redirect('http://localhost:3000/shop/products')
-// })
 router.get("/", (req, res)=>{
     res.send('<a href="/login_with_facebook/auth/facebook">Login With Facebook</a>')
 })
