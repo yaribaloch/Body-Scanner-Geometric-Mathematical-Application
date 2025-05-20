@@ -28,7 +28,6 @@ app.use("/login_with_google", loginWithGoogleRoute)
 app.use("/login_with_facebook", loginWithFacebookRoute)
 app.use("/user", userRoute)
 app.use("/shop", shopRoute)
-//app.use("/placeorder", orderRoute)
 
 app.listen(3000, ()=>{console.log("App is live at port 3000.");
 })
