@@ -61,6 +61,7 @@ async function handleAddToCart(req, res) {
             quantity:1,
             calculatedPrice: product.price
         })
+        
     //calculate and set cart price
     calculateCartPrice(user)
     const savedUser = await user.save()

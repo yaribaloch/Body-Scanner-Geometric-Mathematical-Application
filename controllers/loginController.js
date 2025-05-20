@@ -4,9 +4,7 @@ const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 async function handleLogin(req, res) {
     const data = await loginValidSchema.validateAsync(req.body)
-    const user = await User.findOne({email: data.email})
-    console.log(user);
-    
+    const user = await User.findOne({email: data.email})    
     if(!user)
         return res.status(400).json({
             status: false,
@@ -20,13 +18,12 @@ async function handleLogin(req, res) {
             message: "Could not generate OTP. Please try again."
         })
 
-        const email = sendEmail(user.email, "OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`)
-        console.log(email);
-        
+        const email = sendEmail(user.email, "OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`)        
         if(!email) return res.status(500).json({
             status: false,
             message: "Could not send OTP email. Try again later."
         })
+        
         await User.updateOne({email: user.email}, {otp:otp})
         return res.status(200).json({
             status: false,
