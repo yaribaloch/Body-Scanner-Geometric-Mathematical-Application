@@ -13,8 +13,6 @@ passport.use(new googleStrategy({
     const googleId=profile.id
     const user = await User.findOne({googleId})
     if(!user){
-        console.log("User not found.");
-        
         const newUser = new User({
             googleId:googleId,
             name: profile.displayName, 
@@ -25,7 +23,6 @@ passport.use(new googleStrategy({
         //We don't want to create sessions as we are using JWT login tokens
         return cb(null, newUser, {session:false})
     }else{
-        console.log("User found.");
         //We don't want to create sessions as we are using JWT login tokens
         return cb(null, user, {session:false})
     }
@@ -38,8 +35,6 @@ router.get("/", (req, res)=>{
 router.get('/auth/google', passport.authenticate('google', {scope:["profile", "email"]}))
 router.get('/auth/google/callback', passport.authenticate('google', {session:false,failureRedirect:'/login_with_google/auth/google/error'}), function(req, res){
     const accessToken = JWT.sign({userID: req.user? req.user._id:req.newUser._id}, process.env.JWT_KEY)    
-    console.log
-    ("ID: ",req.user._id)
     res.status(300).json({
     status: true,
     message: "User authenticated via Google.",

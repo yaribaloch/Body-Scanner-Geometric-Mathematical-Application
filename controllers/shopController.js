@@ -180,10 +180,8 @@ async function handleSetItemQuantity(req, res) {
         calculatedPrice: product.price * quantity
     }
     //update item
-    console.log("items: ", product);
     const newItems = user.cart.items.map(itm=>itm.productID==productID?item:itm)
     user.cart.items=newItems
-    console.log("new items: ", newItems);
     
     //calculate and set cart price
     calculateCartPrice(user)
@@ -234,35 +232,6 @@ async function handleAddProduct(req, res) {
             status:false,
             message: "Array of products expected."
         })
-    // const { size,brand,type, colors,price,rating,category,description} = req.body
-
-    // const newProduct = new Product({
-        
-    // size: size,
-    // brand: brand,
-    // type: type,
-    // colors: colors,
-    // price: price,
-    // rating: rating,
-    // category: category,
-    // description: description,
-    // createdBy: userID})
-    // const savedProduct = await newProduct.save()
-    // if(!savedProduct)
-    //     return res
-    //     .staus(400)
-    //     .json({
-    //         status:false,
-    //         message: "Couldn't save the Product."
-    //     })
-
-    // return res
-    // .status(300)
-    // .json({
-    //     status:true,
-    //     message: "Product saved successfuly.",
-    //     newProduct: savedProduct
-    // })
 }
 async function handlePlaceOrder(req, res) {
     const userID = req.userID
