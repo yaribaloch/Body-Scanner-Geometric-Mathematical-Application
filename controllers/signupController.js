@@ -10,7 +10,6 @@ try{
     const data = await signupValidSchema.validateAsync(req.body)
     const lowerCaseEmail = data.email.toLowerCase()  
     const user = await User.findOne({email: lowerCaseEmail})    
-    console.log(data);
         
     if(user){
         if(user.verified) return res.status(400).json({
@@ -25,7 +24,6 @@ try{
         })
 
         const email = sendEmail(lowerCaseEmail, "OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`)
-        console.log(email);
         
         if(!email) return res.status(500).json({
             status: false,
@@ -49,13 +47,11 @@ try{
     })
 
     const email = sendEmail(lowerCaseEmail, "OTP Verification", `Your OTP for BSGMA is ${otp}. Please use this OTP to verify yout BSGMA account.`)
-    console.log(email);
     
     if(!email) return res.status(500).json({
         status: false,
         message: "Could not send OTP email. Try again later."
     })
-    console.log(data);
     const hashedPassword = await bcrypt.hash(data.password, 10)
     const newUser = new User({
         email: lowerCaseEmail,

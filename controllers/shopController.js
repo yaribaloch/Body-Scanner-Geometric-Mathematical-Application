@@ -6,8 +6,6 @@ const {makeStripePayment} = require("../utilities/stripePayment")
 const stripe = require("stripe")(process.env.STRIPE_SECRET)
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
-const {generateOTP} = require("../utilities/generateOTP")
-const {sendEmail} = require("../utilities/sendMail")
 const { default: mongoose } = require("mongoose")
 const { default: Stripe } = require("stripe")
 async function handleShop(req, res) {
@@ -52,15 +50,15 @@ async function handleAddToCart(req, res) {
             status:false,
             message:"Item already in cart."
         })
-        //push new product into cart items
-        user.cart.items.push({
-            productID: product._id,
-            name: product.name,
-            description: product.description,
-            imageUrl:product.imageUrl,
-            quantity:1,
-            calculatedPrice: product.price
-        })
+    //push new product into cart items
+    user.cart.items.push({
+        productID: product._id,
+        name: product.name,
+        description: product.description,
+        imageUrl:product.imageUrl,
+        quantity:1,
+        calculatedPrice: product.price
+    })
         
     //calculate and set cart price
     calculateCartPrice(user)
